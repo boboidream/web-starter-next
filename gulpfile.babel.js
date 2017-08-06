@@ -8,6 +8,9 @@ import header from 'gulp-header'
 import del from 'del'
 
 import pkg from './package.json'
+import webpack from 'webpack'
+import gulpWebpack from 'webpack-stream'
+import webpackConf from './build/webpack.config.babel'
 
 const opts = {
   header: `
@@ -43,4 +46,14 @@ gulp.task('clean', () => {
   return stream
 })
 
-gulp.task('dev', gulp.series('clean', gulp.parallel('less:dev', 'tmpl:dev')))
+
+gulp.task('webpack:dev', (cb) => {
+  return gulp.src('./src/**/*.js')
+      .pipe(gulpWebpack(webpackConf, webpack))
+      .pipe(gulp.dest('.tmp/'))
+  // webpack(webpackConf, (err, stats) => {
+  //   cb()
+  // })
+})
+
+gulp.task('dev', gulp.series('clean', gulp.parallel('less:dev', 'tmpl:dev', 'webpack:dev')))

@@ -12,6 +12,8 @@ import webpack from 'webpack'
 import gulpWebpack from 'webpack-stream'
 import webpackConf from './build/webpack.config.babel'
 
+import rev from 'gulp-rev'
+
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 
@@ -38,7 +40,13 @@ gulp.task('less:dev', () => {
         plugins: [new Autoprefix()]
       }))
       .pipe(header(opts.header, {pkg: pkg}))
+      .pipe(rev())
       .pipe(gulp.dest('./.tmp/'))
+      .pipe(rev.manifest('.tmp/manifest.json', {
+        merge: true,
+        base: '.tmp/'
+      }))
+      .pipe(gulp.dest('.tmp'))
 })
 
 gulp.task('clean', () => {

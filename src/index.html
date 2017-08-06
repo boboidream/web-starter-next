@@ -9,7 +9,13 @@
 </head>
 <body>
   <h1>Welcome to use Web-starter-next!</h1>
-  {% include './templates/_list.html' %}
+
+  <main>
+    {% include './templates/_list.html' %}
+    {% include './templates/_intro.html' %}
+    <img src="./images/loading.gif" alt="加载中">
+    <p>Test update hot.</p>
+  </main>
 
   <script src="./scripts/app.js"></script>
 </body>

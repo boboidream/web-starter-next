@@ -1,3 +1,3 @@
-const hello = 'hellll'
+const hello = 'Javascript compiled success! '
 
 export default hello

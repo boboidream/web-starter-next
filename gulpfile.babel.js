@@ -12,6 +12,9 @@ import webpack from 'webpack'
 import gulpWebpack from 'webpack-stream'
 import webpackConf from './build/webpack.config.babel'
 
+const rollup = require('rollup')
+const babel = require('rollup-plugin-babel')
+
 const opts = {
   header: `
 /**
@@ -30,7 +33,7 @@ gulp.task('tmpl:dev', () => {
 })
 
 gulp.task('less:dev', () => {
-  return gulp.src(['./src/**/*.less', ])
+  return gulp.src(['./src/**/*.less', '!./src/**/_*.less'])
       .pipe(less({
         plugins: [new Autoprefix()]
       }))
@@ -56,4 +59,23 @@ gulp.task('webpack:dev', (cb) => {
   // })
 })
 
-gulp.task('dev', gulp.series('clean', gulp.parallel('less:dev', 'tmpl:dev', 'webpack:dev')))
+
+gulp.task('rollup:dev', function () {
+  return rollup.rollup({
+    entry: './src/scripts/app.js',
+    plugins: [
+      babel({
+        plugins:  ['external-helpers']
+      })
+    ]
+  })
+  .then(function(bundle) {
+    bundle.write({
+      format: 'es',
+      dest: './.tmp/library.js',
+      sourceMap: true
+      })
+    })
+})
+
+gulp.task('dev', gulp.series('clean', gulp.parallel('less:dev', 'tmpl:dev', 'rollup:dev')))

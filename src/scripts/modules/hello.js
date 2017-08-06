@@ -1,3 +1,3 @@
 const hello = 'hellll'
 
-module.exports = hello
+export default hello

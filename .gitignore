@@ -31,3 +31,7 @@ node_modules/
 ################
 .settings/
 .vscode/
+
+# Dev Cache #
+#############
+.tmp

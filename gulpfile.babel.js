@@ -13,9 +13,12 @@ import gulpWebpack from 'webpack-stream'
 import webpackConf from './build/webpack.config.babel'
 
 import rev from 'gulp-rev'
+import collector from 'gulp-rev-collector'
 
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
+
+import btRollup from 'gulp-better-rollup'
 
 const opts = {
   header: `
@@ -32,6 +35,14 @@ gulp.task('tmpl:dev', () => {
   return gulp.src(['./src/**/*.html', '!./src/**/_*.html'])
       .pipe(swig())
       .pipe(gulp.dest('./.tmp/'))
+})
+
+gulp.task('rev:dev', () => {
+  return gulp.src(['.tmp/**/*.html', '.tmp/*.json'])
+      .pipe(collector({
+
+      }))
+      .pipe(gulp.dest('.tmp/'))
 })
 
 gulp.task('less:dev', () => {
@@ -86,4 +97,32 @@ gulp.task('rollup:dev', function () {
     })
 })
 
-gulp.task('dev', gulp.series('clean', gulp.parallel('less:dev', 'tmpl:dev', 'rollup:dev')))
+gulp.task('btRollup:dev', () => {
+  return gulp.src('./src/scripts/app.js')
+      .pipe(btRollup({
+        plugins: [
+          babel({
+            plugins:  ['external-helpers']
+          })
+        ]
+      }, {
+        format: 'es'
+      }))
+      .pipe(rev())
+      .pipe(gulp.dest('.tmp/scripts/'))
+      .pipe(rev.manifest('.tmp/manifest.json', {
+        merge: true,
+        base: '.tmp/'
+      }))
+      .pipe(gulp.dest('.tmp/'))
+
+})
+
+gulp.task('dev', gulp.series(
+    'clean',
+    gulp.series(
+      gulp.parallel('less:dev', 'btRollup:dev', 'tmpl:dev'),
+      'rev:dev'
+    )
+  )
+)

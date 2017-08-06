@@ -6,21 +6,13 @@ import less from 'gulp-less'
 import Autoprefix from 'less-plugin-autoprefix'
 import header from 'gulp-header'
 import del from 'del'
-
-import pkg from './package.json'
-import webpack from 'webpack'
-import gulpWebpack from 'webpack-stream'
-import webpackConf from './build/webpack.config.babel'
-
+import btRollup from 'gulp-better-rollup'
+import babel from 'rollup-plugin-babel'
 import rev from 'gulp-rev'
 import collector from 'gulp-rev-collector'
-
-const rollup = require('rollup')
-const babel = require('rollup-plugin-babel')
-
-import btRollup from 'gulp-better-rollup'
-
 import browserSyncPlugin from 'browser-sync'
+import pkg from './package.json'
+
 const browserSync = browserSyncPlugin.create()
 
 const opts = {
@@ -74,13 +66,6 @@ gulp.task('clean', () => {
   return stream
 })
 
-// webpack 打包 废弃
-gulp.task('webpack:dev', (cb) => {
-  return gulp.src('./src/**/*.js')
-      .pipe(gulpWebpack(webpackConf, webpack))
-      .pipe(gulp.dest('.tmp/'))
-})
-
 gulp.task('copy:images', () => {
   return gulp.src('./src/images/**/*')
       .pipe(gulp.dest('.tmp/images'))
@@ -89,25 +74,6 @@ gulp.task('copy:images', () => {
 gulp.task('copy:favicon', () => {
   return gulp.src('build/favicon.ico', { base: 'build/' })
       .pipe(gulp.dest('.tmp'))
-})
-
-// 原生 rollup 写法 废弃
-gulp.task('rollup:dev', function () {
-  return rollup.rollup({
-    entry: './src/scripts/app.js',
-    plugins: [
-      babel({
-        plugins:  ['external-helpers']
-      })
-    ]
-  })
-  .then(function(bundle) {
-    bundle.write({
-      format: 'es',
-      dest: './.tmp/library.js',
-      sourceMap: true
-      })
-    })
 })
 
 gulp.task('btRollup:dev', () => {
@@ -128,7 +94,6 @@ gulp.task('btRollup:dev', () => {
         base: '.tmp/'
       }))
       .pipe(gulp.dest('.tmp/'))
-
 })
 
 gulp.task('server', () => {
